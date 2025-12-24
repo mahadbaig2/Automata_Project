@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Task Calendar{% endblock %}
+{% block content %}
+<h2 class="mb-4">📅 Task Calendar</h2>
+<div id="calendar"></div>
+
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const calendarEl = document.getElementById('calendar');
+  const calendar = new FullCalendar.Calendar(calendarEl, {
+    initialView: 'dayGridMonth',
+    events: {{ events|tojson }},
+    height: "auto"
+  });
+  calendar.render();
+});
+</script>
+
+<style>
+#calendar {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+</style>
+{% endblock %}

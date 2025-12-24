@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+
+<h2 class="mb-4">📊 Dashboard Overview</h2>
+
+<div class="row g-4 mb-4">
+  <div class="col-md-3">
+    <div class="card border-primary text-primary shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title">📌 Total Tasks</h5>
+        <p class="card-text fs-3 fw-bold">{{ total }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card border-warning text-warning shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title">⏳ Pending</h5>
+        <p class="card-text fs-3 fw-bold">{{ pending }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card border-success text-success shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title">✅ Completed</h5>
+        <p class="card-text fs-3 fw-bold">{{ completed }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card border-danger text-danger shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title">⚠️ Overdue</h5>
+        <p class="card-text fs-3 fw-bold">{{ overdue }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4 mb-4">
+  <div class="col-md-6">
+    <div class="card border-danger text-danger shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title">🔴 High Priority</h5>
+        <p class="card-text fs-3 fw-bold">{{ high_priority }}</p>
+        <small class="text-muted">Urgent pending tasks</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title">🔁 Recurring Tasks</h5>
+        <p class="card-text fs-3 fw-bold text-info">{{ recurring }}</p>
+        <small class="text-muted">Daily, Weekly, or Monthly repeating tasks</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4 mb-4">
+  <div class="col-md-12">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title">📈 Completion Rate</h5>
+        <p class="card-text fs-3 fw-bold text-success">{{ completion_rate }}%</p>
+        <div class="progress" style="height: 25px;">
+          <div class="progress-bar bg-success" role="progressbar" style="width: {{ completion_rate }}%">
+            {{ completion_rate }}%
+          </div>
+        </div>
+        <small class="text-muted mt-2 d-block">Completed: {{ completed }} | Overdue: {{ overdue }}</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="my-4">
+
+<h4 class="mb-3">🔔 Upcoming Tasks</h4>
+<ul class="list-group mb-4">
+  {% if upcoming %}
+    {% for task in upcoming %}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <div>
+          <strong>{{ task.description }}</strong>
+          <br>
+          <small class="text-muted">{{ task.remind_time }}</small>
+        </div>
+        <div>
+          {% if task.priority == 'High' %}
+            <span class="badge bg-danger me-2">🔴 High</span>
+          {% elif task.priority == 'Medium' %}
+            <span class="badge bg-warning text-dark me-2">🟡 Medium</span>
+          {% else %}
+            <span class="badge bg-success me-2">🟢 Low</span>
+          {% endif %}
+
+          {% if task.repeat != 'once' %}
+            <span class="badge bg-info">🔁 {{ task.repeat.capitalize() }}</span>
+          {% endif %}
+        </div>
+      </li>
+    {% endfor %}
+  {% else %}
+    <li class="list-group-item">No upcoming tasks. Great job staying organized! 🎉</li>
+  {% endif %}
+</ul>
+
+<hr class="my-4">
+
+<h4 class="mb-3">📈 Analytics</h4>
+<div class="row g-4">
+  <div class="col-md-4">
+    <div class="card p-3 shadow-sm">
+      <h6 class="text-center mb-3">Task Status Distribution</h6>
+      <canvas id="statusChart"></canvas>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card p-3 shadow-sm">
+      <h6 class="text-center mb-3">Priority Distribution</h6>
+      <canvas id="priorityChart"></canvas>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card p-3 shadow-sm">
+      <h6 class="text-center mb-3">Tasks Over Last 7 Days</h6>
+      <canvas id="barChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Status Chart
+const statusChart = new Chart(document.getElementById('statusChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Pending', 'Completed', 'Overdue'],
+    datasets: [{
+      label: 'Tasks',
+      data: [{{ status_data['Pending'] }}, {{ status_data['Completed'] }}, {{ status_data['Overdue'] }}],
+      backgroundColor: ['#ffc107', '#198754', '#dc3545'],
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { position: 'bottom' }
+    }
+  }
+});
+
+// Priority Chart
+const priorityChart = new Chart(document.getElementById('priorityChart'), {
+  type: 'pie',
+  data: {
+    labels: ['High Priority', 'Medium Priority', 'Low Priority'],
+    datasets: [{
+      label: 'Priority',
+      data: [
+        {{ priority_data['High'] }},
+        {{ priority_data['Medium'] }},
+        {{ priority_data['Low'] }}
+      ],
+      backgroundColor: ['#dc3545', '#ffc107', '#28a745'],
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { position: 'bottom' }
+    }
+  }
+});
+
+// Bar Chart
+const barChart = new Chart(document.getElementById('barChart'), {
+  type: 'bar',
+  data: {
+    labels: {{ labels | tojson }},
+    datasets: [{
+      label: 'Tasks per Day',
+      data: {{ chart_data | tojson }},
+      backgroundColor: '#0d6efd'
+    }]
+  },
+  options: {
+    responsive: true,
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: {
+          stepSize: 1
+        }
+      }
+    }
+  }
+});
+</script>
+
+<style>
+  .dark-mode .card {
+    background-color: #1e1e1e;
+    color: #ffffff;
+  }
+
+  .dark-mode .list-group-item {
+    background-color: #1e1e1e;
+    color: #ffffff;
+    border-color: #444;
+  }
+
+  .dark-mode .progress {
+    background-color: #2c2c2c;
+  }
+</style>
+
+{% endblock %}

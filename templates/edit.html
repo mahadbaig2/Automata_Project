@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Edit Task{% endblock %}
+{% block content %}
+<h2 class="mb-4">✏️ Edit Task</h2>
+
+<form method="POST" class="bg-white p-4 rounded shadow-sm">
+  <div class="mb-3">
+    <label class="form-label">Task Description</label>
+    <input type="text" name="description" class="form-control" value="{{ task.description }}" required>
+  </div>
+  <div class="mb-3 row">
+    <div class="col">
+      <label class="form-label">Date</label>
+      <input type="date" name="date" class="form-control" value="{{ task.remind_time[:10] }}" required>
+    </div>
+    <div class="col">
+      <label class="form-label">Time</label>
+      <input type="time" name="time" class="form-control" value="{{ task.remind_time[11:] }}" required>
+    </div>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Reminder Offset</label>
+    <select name="reminder_offset" class="form-select">
+      <option value="5" {% if task.reminder_offset == 5 %}selected{% endif %}>5 minutes</option>
+      <option value="10" {% if task.reminder_offset == 10 %}selected{% endif %}>10 minutes</option>
+      <option value="30" {% if task.reminder_offset == 30 %}selected{% endif %}>30 minutes</option>
+    </select>
+  </div>
+  <button type="submit" class="btn btn-primary w-100">Update Task</button>
+</form>
+{% endblock %}

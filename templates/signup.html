@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Sign Up{% endblock %}
+{% block content %}
+
+<div class="row justify-content-center mt-5">
+  <div class="col-md-5">
+    <div class="card shadow-lg border-0">
+      <div class="card-body p-5">
+        <h2 class="text-center mb-4">📝 Create Account</h2>
+        <p class="text-center text-muted mb-4">Join Task Reminder Bot today!</p>
+
+        <form method="POST">
+          <div class="mb-3">
+            <label class="form-label">👤 Username</label>
+            <input type="text" name="username" class="form-control form-control-lg" placeholder="Choose a username" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">📧 Email Address</label>
+            <input type="email" name="email" class="form-control form-control-lg" placeholder="your@email.com" required>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label">🔒 Password</label>
+            <input type="password" name="password" class="form-control form-control-lg" placeholder="Create a strong password" required minlength="6">
+            <small class="text-muted">Minimum 6 characters</small>
+          </div>
+
+          <button type="submit" class="btn btn-success btn-lg w-100 mb-3">Create Account</button>
+
+          <hr>
+
+          <p class="text-center mb-0">
+            Already have an account?
+            <a href="/login" class="text-decoration-none fw-bold">Login here</a>
+          </p>
+        </form>
+      </div>
+    </div>
+
+    <div class="card mt-4 bg-info bg-opacity-10 border-info">
+      <div class="card-body">
+        <h6 class="fw-bold">✨ What you'll get:</h6>
+        <ul class="mb-0">
+          <li>🤖 <strong>Smart Priority Assignment</strong> - AI-powered task ranking</li>
+          <li>🔔 <strong>Multi-channel Reminders</strong> - Email & Browser notifications</li>
+          <li>🔁 <strong>Recurring Tasks</strong> - Automatic task repetition</li>
+          <li>📊 <strong>Analytics Dashboard</strong> - Track your productivity</li>
+          <li>📅 <strong>Calendar View</strong> - Visual task planning</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+  }
+
+  .card {
+    border-radius: 15px;
+  }
+
+  .dark-mode .card {
+    background-color: #1e1e1e;
+    color: #ffffff;
+  }
+
+  .dark-mode input {
+    background-color: #2c2c2c;
+    color: #ffffff;
+    border-color: #444;
+  }
+
+  .dark-mode .bg-info {
+    background-color: #1a4d7a !important;
+  }
+</style>
+
+{% endblock %}

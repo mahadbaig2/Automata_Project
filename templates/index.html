@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Add Task{% endblock %}
+{% block content %}
+<h2 class="mb-4">➕ Add a New Task</h2>
+
+<form method="POST" action="/add" class="bg-white p-4 rounded shadow-sm">
+  <div class="mb-3">
+    <label class="form-label">Task Description</label>
+    <input type="text" name="description" class="form-control" placeholder="e.g. Submit assignment, Urgent meeting" required>
+    <small class="text-muted">💡 Tip: Use keywords like 'urgent', 'important', 'critical' for automatic high priority</small>
+  </div>
+
+  <div class="mb-3 row">
+    <div class="col">
+      <label class="form-label">Date</label>
+      <input type="date" name="date" class="form-control" required>
+    </div>
+    <div class="col">
+      <label class="form-label">Time</label>
+      <input type="time" name="time" class="form-control" required>
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Reminder Offset</label>
+    <select name="reminder_offset" class="form-select">
+      <option value="5">5 minutes before</option>
+      <option value="10">10 minutes before</option>
+      <option value="30">30 minutes before</option>
+      <option value="60">1 hour before</option>
+      <option value="1440">1 day before</option>
+    </select>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">🔁 Repeat Schedule</label>
+    <select name="repeat" class="form-select">
+      <option value="once">Once (No repeat)</option>
+      <option value="daily">Daily</option>
+      <option value="weekly">Weekly</option>
+      <option value="monthly">Monthly</option>
+    </select>
+    <small class="text-muted">Recurring tasks will automatically create new instances</small>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">🔔 Alert Type</label>
+    <select name="alert_type" class="form-select">
+      <option value="both">📧 Email + 🌐 Browser</option>
+      <option value="email">📧 Email Only</option>
+      <option value="browser">🌐 Browser Only</option>
+    </select>
+  </div>
+
+  <div class="alert alert-info">
+    <strong>🤖 Smart Priority:</strong> Priority will be automatically assigned based on deadline urgency and keywords in your description!
+  </div>
+
+  <button type="submit" class="btn btn-success w-100">Add Task</button>
+</form>
+
+<style>
+  .dark-mode .bg-white {
+    background-color: #1e1e1e !important;
+  }
+
+  .dark-mode input, .dark-mode select {
+    background-color: #2c2c2c;
+    color: #ffffff;
+    border-color: #444;
+  }
+</style>
+{% endblock %}

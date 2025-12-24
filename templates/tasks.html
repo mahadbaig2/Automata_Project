@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+{% block title %}Task List{% endblock %}
+{% block content %}
+<h2 class="mb-4">📋 Your Tasks</h2>
+
+<div class="table-responsive shadow-sm">
+  <form method="GET" action="/tasks" class="row g-3 mb-4">
+    <div class="col-md-2">
+      <input type="date" name="start" class="form-control" placeholder="Start date" value="{{ request.args.get('start', '') }}">
+    </div>
+    <div class="col-md-2">
+      <input type="date" name="end" class="form-control" placeholder="End date" value="{{ request.args.get('end', '') }}">
+    </div>
+    <div class="col-md-3">
+      <input type="text" name="q" class="form-control" placeholder="Search description" value="{{ request.args.get('q', '') }}">
+    </div>
+    <div class="col-md-2">
+      <select name="priority" class="form-select">
+        <option value="">All Priorities</option>
+        <option value="High" {% if request.args.get('priority') == 'High' %}selected{% endif %}>🔴 High</option>
+        <option value="Medium" {% if request.args.get('priority') == 'Medium' %}selected{% endif %}>🟡 Medium</option>
+        <option value="Low" {% if request.args.get('priority') == 'Low' %}selected{% endif %}>🟢 Low</option>
+      </select>
+    </div>
+    <div class="col-md-2">
+      <select name="status" class="form-select">
+        <option value="">All Status</option>
+        <option value="Pending" {% if request.args.get('status') == 'Pending' %}selected{% endif %}>Pending</option>
+        <option value="Completed" {% if request.args.get('status') == 'Completed' %}selected{% endif %}>Completed</option>
+        <option value="Overdue" {% if request.args.get('status') == 'Overdue' %}selected{% endif %}>Overdue</option>
+        <option value="Archived" {% if request.args.get('status') == 'Archived' %}selected{% endif %}>Archived</option>
+      </select>
+    </div>
+    <div class="col-md-1">
+      <button type="submit" class="btn btn-outline-primary w-100">🔍</button>
+    </div>
+  </form>
+
+  <table class="table table-striped table-bordered align-middle">
+    <thead class="table-primary">
+      <tr>
+        <th>Priority</th>
+        <th>Description</th>
+        <th>Remind Time</th>
+        <th>Repeat</th>
+        <th>Alert</th>
+        <th>Status</th>
+        <th>FSM State</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for task in tasks %}
+      <tr class="priority-{{ task.priority.lower() }}">
+        <td>
+          {% if task.priority == 'High' %}
+            <span class="badge bg-danger">🔴 High</span>
+          {% elif task.priority == 'Medium' %}
+            <span class="badge bg-warning text-dark">🟡 Medium</span>
+          {% else %}
+            <span class="badge bg-success">🟢 Low</span>
+          {% endif %}
+        </td>
+        <td><strong>{{ task.description }}</strong></td>
+        <td>{{ task.remind_time }}</td>
+        <td>
+          {% if task.repeat == 'once' %}
+            <span class="badge bg-secondary">Once</span>
+          {% elif task.repeat == 'daily' %}
+            <span class="badge bg-info">🔁 Daily</span>
+          {% elif task.repeat == 'weekly' %}
+            <span class="badge bg-info">🔁 Weekly</span>
+          {% elif task.repeat == 'monthly' %}
+            <span class="badge bg-info">🔁 Monthly</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if task.alert_type == 'both' %}
+            📧🌐
+          {% elif task.alert_type == 'email' %}
+            📧
+          {% else %}
+            🌐
+          {% endif %}
+        </td>
+        <td>
+          {% if task.status == 'Pending' %}
+            <span class="badge bg-warning text-dark">⏳ Pending</span>
+          {% elif task.status == 'Completed' %}
+            <span class="badge bg-success">✅ Completed</span>
+          {% elif task.status == 'Overdue' %}
+            <span class="badge bg-danger">⚠️ Overdue</span>
+          {% elif task.status == 'Archived' %}
+            <span class="badge bg-secondary">📦 Archived</span>
+          {% endif %}
+        </td>
+        <td><small class="text-muted">{{ task.fsm_state }}</small></td>
+        <td class="d-flex gap-1 flex-wrap">
+          <a href="/edit/{{ task.id }}" class="btn btn-sm btn-primary">✏️</a>
+          {% if task.status in ['Pending', 'Overdue'] %}
+          <a href="/complete/{{ task.id }}" class="btn btn-sm btn-success">✅</a>
+          {% endif %}
+          <a href="/delete/{{ task.id }}" class="btn btn-sm btn-danger" onclick="return confirm('Delete this task?')">🗑</a>
+        </td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="8" class="text-center text-muted">No tasks found. <a href="/">Add your first task!</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="mt-4 d-flex gap-2 flex-wrap">
+  <a href="/" class="btn btn-outline-secondary">➕ Add Task</a>
+  <a href="/calendar" class="btn btn-outline-info">📅 Calendar View</a>
+  <a href="/dashboard" class="btn btn-outline-primary">📊 Dashboard</a>
+  <a href="/export" class="btn btn-outline-success">📤 Export CSV</a>
+</div>
+
+<style>
+  .priority-high {
+    border-left: 4px solid #dc3545;
+  }
+  .priority-medium {
+    border-left: 4px solid #ffc107;
+  }
+  .priority-low {
+    border-left: 4px solid #28a745;
+  }
+
+  .dark-mode .table {
+    background-color: #1e1e1e;
+    color: #ffffff;
+  }
+
+  .dark-mode .table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: #2a2a2a;
+  }
+
+  .dark-mode .table-primary {
+    background-color: #1a4d7a !important;
+    color: #ffffff;
+  }
+</style>
+
+<script>
+function startNotificationPolling() {
+  if (Notification.permission !== "granted") {
+    Notification.requestPermission();
+  }
+
+  setInterval(() => {
+    fetch('/check-local-notifications')
+      .then(res => res.json())
+      .then(data => {
+        if (data.notifications) {
+          data.notifications.forEach(task => {
+            let icon = "https://cdn-icons-png.flaticon.com/512/1827/1827415.png";
+            let badge = task.priority === 'High' ? '🔴' : task.priority === 'Medium' ? '🟡' : '🟢';
+
+            new Notification(`${badge} Task Reminder [${task.priority}]`, {
+              body: task.description,
+              icon: icon,
+              badge: icon
+            });
+          });
+        }
+      });
+  }, 60000);
+}
+document.addEventListener("DOMContentLoaded", startNotificationPolling);
+</script>
+{% endblock %}

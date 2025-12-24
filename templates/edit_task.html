@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Edit Task{% endblock %}
+{% block content %}
+<h2>Edit Task</h2>
+<form method="POST">
+  <div class="mb-3">
+    <input type="text" name="description" value="{{ task.description }}" class="form-control" required>
+  </div>
+  <div class="mb-3">
+    <input type="datetime-local" name="remind_time" value="{{ task.remind_time|replace(' ', 'T') }}" class="form-control" required>
+  </div>
+  <div class="mb-3">
+    <select name="repeat" class="form-select">
+      <option value="once" {% if task.repeat == 'once' %}selected{% endif %}>Once</option>
+      <option value="daily" {% if task.repeat == 'daily' %}selected{% endif %}>Daily</option>
+      <option value="weekly" {% if task.repeat == 'weekly' %}selected{% endif %}>Weekly</option>
+    </select>
+  </div>
+  <div class="mb-3">
+    <select name="alert_type" class="form-select">
+      <option value="both" {% if task.alert_type == 'both' %}selected{% endif %}>Email + Browser</option>
+      <option value="email" {% if task.alert_type == 'email' %}selected{% endif %}>Email Only</option>
+      <option value="browser" {% if task.alert_type == 'browser' %}selected{% endif %}>Browser Only</option>
+    </select>
+  </div>
+  <button type="submit" class="btn btn-primary">💾 Save Changes</button>
+  <a href="/tasks" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}
